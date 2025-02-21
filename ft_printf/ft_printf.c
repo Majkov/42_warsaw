@@ -6,7 +6,7 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 15:26:51 by mmajka            #+#    #+#             */
-/*   Updated: 2025/02/16 14:13:39 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/02/21 21:50:38 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,24 +41,28 @@ int	check(char placeholder, va_list args)
 
 	arguments = "cspdiuxX";
 	j = 0;
-	while(arguments[j] != '\0')
+	if(placeholder == '%')
 	{
-		if(placeholder == '%')
-		{
-			..;
-		}
-		else if(placeholder == arguments[j])
-		{
-			assignment();
-			break;
-		}
-		else
-		{
-			..;
-		}
-		++j;
+		write(1, "%", 1);
 	}
-	return ();
+	else
+	{
+		while(arguments[j] != '\0')
+		{
+			if(placeholder == arguments[j])
+			{
+				assignment();
+				break;
+			}
+			++j;
+		}
+	}
+	if(arguments[j] == '\0')
+	{
+		printf("ERROR!\n");
+		return (1);
+	}
+	return (0);
 }
 
 int assignment(char placeholder, va_list args)
@@ -73,3 +77,52 @@ int assignment(char placeholder, va_list args)
 	if(placeholder == 'X') // unsigned int
 	return();
 }
+
+//Signed decimal integer
+static int	int_write(unsigned int number, char placeholder)
+{
+	int divisor;
+	char digit;
+
+	if (number == 0)
+	{
+		write(1, "0", 1);
+		return (0);
+	}
+	if (placeholder == 'd' || placeholder == 'i' || placeholder == 'u')
+		divisor = 10;
+	else
+		divisor = 16;
+	while (number)
+	{
+		digit = number % divisor;
+		if (digit < 10)
+		{
+			digit += '0';
+		}
+		else if (placeholder == 'x')
+		{
+			digit += 'a';
+		}
+		else if (placeholder == 'X')
+		{
+			digit += 'A';
+		}
+	}
+	
+}
+
+// String of characters
+static int string_write();
+
+// Character
+static int	char_write();
+
+// Pointer address
+static int	pointer_write();
+
+// Unsigned decimal integer
+static int	unsignedint_write();
+
+// Unsigned hexadecimal integer
+static int	hex_write();
