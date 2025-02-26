@@ -17,18 +17,19 @@ int	ft_printf(const char *str, ...);
 static int	check(char type, va_list args);
 static int assignment(char type, va_list args);
 static int	int_write(unsigned int number, char type);
-static int	string_write();
-static int	char_write();
-static int	pointer_write();
+static int	string_write(char *pointer);
+static int	char_write(int input);
+static int	pointer_write(void *pointer);
 static int	unsignedint_write();
 static int	hex_write();
+static int	reverse(long int input);
 
 int	main()
 {
 	int number;
 
 	number = 11;
-	ft_printf("abc %u\n", 17);
+	ft_printf("abc %s\n", "cba");
 	return (0);
 }
 
@@ -113,6 +114,18 @@ int assignment(char type, va_list args)
 		// write(1, "3.2\n", 4);
 		int_write(va_arg(args, unsigned int), type);
 	}
+	if (type == 'c')
+	{
+		char_write(va_arg(args, int));
+	}
+	if (type == 's')
+	{
+		string_write(va_arg(args, char*));
+	}
+	if (type == 'p')
+	{
+		pointer_write(va_arg(args, void*));
+	}
 	// if(type == 'd') // int
 	// if(type == 'i') // int
 	// if(type == 'x') // unsigned int
@@ -130,6 +143,7 @@ static int	int_write(unsigned int number, char type)
 	int divisor;
 	char digit;
 
+	number = (unsigned int)reverse((long int)number);
 	// write(1, "4\n", 2);
 	if (number == 0)
 	{
@@ -161,13 +175,43 @@ static int	int_write(unsigned int number, char type)
 	return (0);
 }
 
+static int	reverse(long int input)
+{
+	long int output;
+
+	output = 0;
+
+	while (input)
+	{
+		output = output * 10 + (input % 10);
+		input /= 10;
+	}
+	return (output);
+}
+
 // String of characters
-static int string_write()
-{}
+static int string_write(char *pointer)
+{
+	int	i;
+
+	i = 0;
+	while (pointer[i] != '\0')
+	{
+		write(1, &pointer[i], 1);
+		++i;
+	}
+	return (0);
+}
 
 // Character
-static int	char_write()
-{}
+static int	char_write(int input)
+{
+	char	output;
+
+	output = (char)input;
+	write(1, &output, 1);
+	return (0);
+}
 
 // Pointer address
 static int	pointer_write()
