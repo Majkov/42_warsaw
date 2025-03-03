@@ -6,7 +6,7 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 15:26:51 by mmajka            #+#    #+#             */
-/*   Updated: 2025/02/27 20:32:36 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/03 20:25:51 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,29 +24,30 @@ static int	char_write(int input);
 static int	pointer_write(uintptr_t number);
 static int	unsignedint_write();
 static int	hex_write();
-static int	reverse(uintptr_t input);
+static uintptr_t reverse(uintptr_t input, int divisor);
 
 int	main()
 {
 	int number;
-
-	number = 11;
+	// cspdiuxX
+	number = -156719;
 	ft_printf("abc %p\n", &number);
-	printf("abc %p\n", &number);
+	printf("%p\n", &number);
 	return (0);
 }
 
 int	ft_printf(const char *str, ...)
 {
-	int i;
-	
-	// write(1, "1\n", 2);
-	va_list args;
+	va_list	args;
+	int		i;
+	int		count;
+
+	count = 0;
 	va_start(args, str);
 	i = 0;
-	while(str[i] != '\0')
+	while (str[i] != '\0')
 	{
-		if(str[i] == '%')
+		if (str[i] == '%')
 		{
 			++i;
 			if (str[i] != '\0')
@@ -55,213 +56,173 @@ int	ft_printf(const char *str, ...)
 		else
 		{
 			write(1, &str[i], 1);
+			++count;
 		}
 		++i;
 	}
-	return (0);
+	return (count);
 }
 
 int	check(char type, va_list args)
 {
 	int	j;
 	char *arguments;
+	int		count;
 
-	// write(1, "2\n", 2);
+	count = 0;
 	arguments = "cspdiuxX";
 	j = 0;
-	if(type == '%')
+	if (type == '%')
 	{
 		write(1, "%", 1);
+		return (1);
 	}
 	else
 	{
-		while(arguments[j] != '\0')
+		while (arguments[j] != '\0')
 		{
-			if(type == arguments[j])
+			if (type == arguments[j])
 			{
-				assignment(arguments[j], args);
-				break;
+				count = assignment(arguments[j], args);
+				return (count);
 			}
 			++j;
 		}
 	}
-	if(arguments[j] == '\0')
-	{
-		write(1, "ERROR!\n", 7);
-		return (1);
-	}
-	return (0);
+	write(1, "ERROR!\n", 7);
+	return (-1);
 }
 
+/* if(type == 'd') int
+if(type == 'i') int
+if(type == 'x') unsigned int
+if(type == 'X') unsigned int
+if(type == 's') char*
+if(type == 'c') int \/ char
+if(type == 'p') void*
+if(type == 'u') unsigned int */
 int assignment(char type, va_list args)
 {
 	long int	temp;
+	int			count;
 
-	// write(1, "3\n", 2);
+	count = 0;
 	if (type == 'd' || type == 'i')
 	{
-		// write(1, "3.1\n", 4);
 		temp = (long int)va_arg(args, int);
-		// write(1, "3.1.1\n", 6);
 		if (temp < 0)
 		{
-			// write(1, "3.1.2\n", 6);
 			write(1, "-", 1);
 			temp *= -1;
 		}
-		// write(1, "3.1.3\n", 6);
 		int_write((unsigned int)temp, type);
 	}
-	if (type == 'u' || type == 'x' || type == 'X')
-	{
-		// write(1, "3.2\n", 4);
-		int_write(va_arg(args, unsigned int), type);
-	}
+	else if (type == 'x' || type == 'X')
+		type -= 23;
+	if (type == 'u' || type == 'a' || type == 'A')
+		count += int_write(va_arg(args, unsigned int), type);
 	if (type == 'c')
-	{
-		char_write(va_arg(args, int));
-	}
+		count += char_write(va_arg(args, int));
 	if (type == 's')
-	{
-		string_write(va_arg(args, char*));
-	}
+		count += string_write(va_arg(args, char*));
 	if (type == 'p')
-	{
-		// write(1, "1\n", 2);
-		pointer_write((uintptr_t)va_arg(args, void*));
-	}
-	// if(type == 'd') // int
-	// if(type == 'i') // int
-	// if(type == 'x') // unsigned int
-	// if(type == 'X') // unsigned int
-	// if(type == 's') // char*
-	// if(type == 'c') // int \/ char
-	// if(type == 'p') // void*
-	// if(type == 'u') // unsigned int
-	return(0);
+		count += pointer_write((uintptr_t)va_arg(args, void*));
+	return(count);
 }
 
-//Signed decimal integer
+/* Used for d, i, u, x, X */
 static int	int_write(unsigned int number, char type)
 {
-	int divisor;
-	char digit;
+	int		divisor;
+	char	digit;
+	int		count;
 
-	// write(1, "4\n", 2);
+	count = 0;
 	if (number == 0)
 	{
 		write(1, "0", 1);
-		return (0);
+		return (1);
 	}
-	number = (unsigned int)reverse((uintptr_t)number);
+	divisor = 16;
 	if (type == 'd' || type == 'i' || type == 'u')
 		divisor = 10;
-	else
-		divisor = 16;
+	number = (unsigned int)reverse((uintptr_t)number, divisor);
 	while (number)
 	{
 		digit = number % divisor;
 		if (digit < 10)
-		{
 			digit += '0';
-		}
-		else if (type == 'x')
-		{
-			digit += 'a' - 10;
-		}
-		else if (type == 'X')
-		{
-			digit += 'A' - 10;
-		}
+		else
+			digit += type - 10;
 		write(1, &digit, 1);
 		number /= divisor;
+		++count;
 	}
-	return (0);
+	return (count - 1);
 }
-
-static int	reverse(uintptr_t input)
+/* Is used to reverse a number in order to output it one digit at a time more easily */
+static uintptr_t	reverse(uintptr_t input, int divisor)
 {
-	// write(1, "3\n", 2);
 	long int output;
 
 	output = 0;
-
 	while (input)
 	{
-		output = output * 10 + (input % 10);
-		input /= 10;
+		output = output * divisor + (input % divisor);
+		input /= divisor;
 	}
 	return (output);
 }
 
-// String of characters
+/* String of characters */
 static int string_write(char *pointer)
 {
-	int	i;
+	int	count;
 
-	i = 0;
-	while (pointer[i] != '\0')
+	count = 0;
+	while (pointer[count] != '\0')
 	{
-		write(1, &pointer[i], 1);
-		++i;
+		write(1, &pointer[count], 1);
+		++count;
 	}
-	return (0);
+	return (count - 1);
 }
 
-// Character
+/* Character */
 static int	char_write(int input)
 {
 	char	output;
 
 	output = (char)input;
 	write(1, &output, 1);
-	return (0);
+	return (1);
 }
 
-// Pointer address
+/* Pointer address */
 static int	pointer_write(uintptr_t number)
 {
-	// write(1, "2\n", 2);
 	int divisor;
 	char digit;
+	int	count;
 
-	// write(1, "4\n", 2);
+	count = 0;
 	if (number == 0)
 	{
-		write(1, "0", 1);
-		return (0);
+		write(1, "(nil)", 5);
+		return (5);
 	}
-	printf("%ld\n", number);
-	number = reverse(number);
-	printf("%ld\n", number);
-	// write(1, "4\n", 2);
-	// divisor = 16;
+	number = reverse(number, 16);
+	write(1, "0x", 2);
 	while (number)
 	{
-		// write(1, "5\n", 2);
 		digit = number % 16;
 		if (digit < 10)
-		{
 			digit += '0';
-			// write(1, "6\n", 2);
-		}
 		else
-		{
 			digit += 'a' - 10;
-			// write(1, "7\n", 2);
-		}
 		write(1, &digit, 1);
-		// write(1, "8\n", 2);
 		number /= 16;
-		// write(1, "9\n", 2);
+		++count;
 	}
-	return (0);
+	return (count + 1);
 }
-
-// Unsigned decimal integer
-static int	unsignedint_write()
-{}
-
-// Unsigned hexadecimal integer
-static int	hex_write()
-{}
