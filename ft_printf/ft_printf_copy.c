@@ -6,7 +6,7 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 15:26:51 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/03 20:25:51 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/05 20:28:18 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,24 @@ static int	int_write(unsigned int number, char type);
 static int	string_write(char *pointer);
 static int	char_write(int input);
 static int	pointer_write(uintptr_t number);
-static int	unsignedint_write();
-static int	hex_write();
 static uintptr_t reverse(uintptr_t input, int divisor);
+static int	int_buffer(long int number);
+// static int	unsignedint_write();
+// static int	hex_write();
 
 int	main()
 {
 	int number;
+	int ftp;
+	int p;
+	
 	// cspdiuxX
-	number = -156719;
-	ft_printf("abc %p\n", &number);
-	printf("%p\n", &number);
+	number = 56719;
+	ftp = 0;
+	p = 0;
+	ftp = ft_printf("abc %i\n", number);
+	p = printf("abc %d\n", number);
+	printf("ftp %d :: p %i\n", ftp, p);
 	return (0);
 }
 
@@ -51,7 +58,7 @@ int	ft_printf(const char *str, ...)
 		{
 			++i;
 			if (str[i] != '\0')
-				check(str[i], args);
+				count += check(str[i], args);
 		}
 		else
 		{
@@ -59,6 +66,7 @@ int	ft_printf(const char *str, ...)
 			++count;
 		}
 		++i;
+		// printf("count %i\n", count);
 	}
 	return (count);
 }
@@ -66,8 +74,8 @@ int	ft_printf(const char *str, ...)
 int	check(char type, va_list args)
 {
 	int	j;
-	char *arguments;
 	int		count;
+	char *arguments;
 
 	count = 0;
 	arguments = "cspdiuxX";
@@ -79,14 +87,14 @@ int	check(char type, va_list args)
 	}
 	else
 	{
-		while (arguments[j] != '\0')
+		while (arguments[j++] != '\0')
 		{
 			if (type == arguments[j])
 			{
-				count = assignment(arguments[j], args);
+				count += assignment(arguments[j], args);
 				return (count);
 			}
-			++j;
+			// ++j;
 		}
 	}
 	write(1, "ERROR!\n", 7);
@@ -101,7 +109,8 @@ if(type == 's') char*
 if(type == 'c') int \/ char
 if(type == 'p') void*
 if(type == 'u') unsigned int */
-int assignment(char type, va_list args)
+
+int	assignment(char type, va_list args)
 {
 	long int	temp;
 	int			count;
@@ -109,13 +118,15 @@ int assignment(char type, va_list args)
 	count = 0;
 	if (type == 'd' || type == 'i')
 	{
-		temp = (long int)va_arg(args, int);
+		count += int_buffer((long int)va_arg(args, int));
+		/* temp = (long int)va_arg(args, int);
 		if (temp < 0)
 		{
 			write(1, "-", 1);
+			++count;
 			temp *= -1;
 		}
-		int_write((unsigned int)temp, type);
+		count += int_write((unsigned int)temp, type); */
 	}
 	else if (type == 'x' || type == 'X')
 		type -= 23;
@@ -127,7 +138,7 @@ int assignment(char type, va_list args)
 		count += string_write(va_arg(args, char*));
 	if (type == 'p')
 		count += pointer_write((uintptr_t)va_arg(args, void*));
-	return(count);
+	return (count);
 }
 
 /* Used for d, i, u, x, X */
@@ -158,12 +169,15 @@ static int	int_write(unsigned int number, char type)
 		number /= divisor;
 		++count;
 	}
-	return (count - 1);
+	printf("int count %i\n", count);
+	return (count);
 }
-/* Is used to reverse a number in order to output it one digit at a time more easily */
+/* Is used to reverse a number in order to
+output it one digit at a time more easily */
+
 static uintptr_t	reverse(uintptr_t input, int divisor)
 {
-	long int output;
+	long int	output;
 
 	output = 0;
 	while (input)
@@ -185,7 +199,7 @@ static int string_write(char *pointer)
 		write(1, &pointer[count], 1);
 		++count;
 	}
-	return (count - 1);
+	return (count);
 }
 
 /* Character */
@@ -213,6 +227,7 @@ static int	pointer_write(uintptr_t number)
 	}
 	number = reverse(number, 16);
 	write(1, "0x", 2);
+	count += 2;
 	while (number)
 	{
 		digit = number % 16;
@@ -224,5 +239,21 @@ static int	pointer_write(uintptr_t number)
 		number /= 16;
 		++count;
 	}
-	return (count + 1);
+	return (count);
+}
+
+int	int_buffer(long int number)
+{
+	int	count;
+
+	count = 0;
+	// temp = (long int)va_arg(args, int);
+	if (number < 0)
+	{
+		write(1, "-", 1);
+		++count;
+		number *= -1;
+	}
+	count += int_write((unsigned int)number, 'u');
+	return (count);
 }
