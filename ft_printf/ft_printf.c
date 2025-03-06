@@ -6,43 +6,22 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 15:26:51 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/05 21:09:56 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/06 18:44:10 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include <stdio.h>
+#include "libftprintf.h"
 
 int					ft_printf(const char *str, ...);
 static int			check(char type, va_list args);
 static int			assignment(char type, va_list args);
-static int			int_write(unsigned int number, char type);
 static int			string_write(char *pointer);
 static int			char_write(int input);
-static int			pointer_write(uintptr_t number);
-static int			int_buffer(long int number);
-static uintptr_t	reverse(uintptr_t input, int divisor);
-// static int	unsignedint_write();
-// static int	hex_write();
 
-int	main()
-{
-	int	number;
-	int	ftp;
-	int	p;
-
-	// cspdiuxX
-	number = 56719;
-	ftp = 0;
-	p = 0;
-	ftp = ft_printf("abc %X\n", number);
-	p = printf("abc %X\n", number);
-	printf("ftp %d :: p %i\n", ftp, p);
-	return (0);
-}
-
+/* 1 */
 int	ft_printf(const char *str, ...)
 {
 	va_list	args;
@@ -70,6 +49,7 @@ int	ft_printf(const char *str, ...)
 	return (count);
 }
 
+/* 2 */
 int	check(char type, va_list args)
 {
 	int		j;
@@ -107,15 +87,14 @@ if(type == 's') char*
 if(type == 'c') int \/ char
 if(type == 'p') void*
 if(type == 'u') unsigned int */
-
+/* 3 */
 int	assignment(char type, va_list args)
 {
-	long int	temp;
 	int			count;
 
 	count = 0;
 	if (type == 'd' || type == 'i')
-		count += int_buffer((long int)va_arg(args, int));
+		count += int_conversion((long int)va_arg(args, int));
 	else if (type == 'x' || type == 'X')
 		type -= 23;
 	if (type == 'u' || type == 'a' || type == 'A')
@@ -129,48 +108,8 @@ int	assignment(char type, va_list args)
 	return (count);
 }
 
-/* Used for d, i, u, x, X */
-static int	int_write(unsigned int number, char type)
-{
-	int		divisor;
-	int		count;
-	char	digit;
-
-	count = 0;
-	if (number == 0)
-	{
-		write(1, "0", 1);
-		return (1);
-	}
-	divisor = 16;
-	if (type == 'd' || type == 'i' || type == 'u')
-		divisor = 10;
-	number = (unsigned int)reverse((uintptr_t)number, divisor);
-	while (number)
-	{
-		digit = number % divisor;
-		digit += '0' + (digit / 10 * (type - '0' - 10));
-		write(1, &digit, 1);
-		number /= divisor;
-		++count;
-	}
-	return (count);
-}
 /* Is used to reverse a number in order to
 output it one digit at a time more easily */
-
-static uintptr_t	reverse(uintptr_t input, int divisor)
-{
-	long int	output;
-
-	output = 0;
-	while (input)
-	{
-		output = output * divisor + (input % divisor);
-		input /= divisor;
-	}
-	return (output);
-}
 
 /* String of characters */
 static int	string_write(char *pointer)
@@ -194,49 +133,4 @@ static int	char_write(int input)
 	output = (char)input;
 	write(1, &output, 1);
 	return (1);
-}
-
-/* Pointer address */
-static int	pointer_write(uintptr_t number)
-{
-	int		divisor;
-	int		count;
-	char	digit;
-
-	count = 0;
-	if (number == 0)
-	{
-		write(1, "(nil)", 5);
-		return (5);
-	}
-	number = reverse(number, 16);
-	write(1, "0x", 2);
-	count += 2;
-	while (number)
-	{
-		digit = number % 16;
-		if (digit < 10)
-			digit += '0';
-		else
-			digit += 'a' - 10;
-		write(1, &digit, 1);
-		number /= 16;
-		++count;
-	}
-	return (count);
-}
-
-int	int_buffer(long int number)
-{
-	int	count;
-
-	count = 0;
-	if (number < 0)
-	{
-		write(1, "-", 1);
-		++count;
-		number *= -1;
-	}
-	count += int_write((unsigned int)number, 'u');
-	return (count);
 }
