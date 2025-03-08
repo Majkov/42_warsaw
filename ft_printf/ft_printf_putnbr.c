@@ -6,7 +6,7 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/08 15:26:51 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/06 18:45:44 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/08 16:14:30 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ output it one digit at a time more easily */
 
 static uintptr_t	reverse(uintptr_t input, int divisor)
 {
-	long int	output;
+	uintptr_t	output;
 
 	output = 0;
 	while (input)
