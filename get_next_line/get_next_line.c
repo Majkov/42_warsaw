@@ -6,11 +6,13 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 19:52:05 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/08 17:34:00 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/13 20:06:20 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /*
 RETURN VALUES OF "READ":
@@ -27,7 +29,19 @@ add this option to your compiler call: -D BUFFER_SIZE=n
 BUFFER_SIZE 42;
 
 #endif
-// int	BUFFER_SIZE = 42;
+/* int	BUFFER_SIZE = 42; 
+
+int main() {
+    int fd = open("example.txt", O_RDONLY);
+    char *line;
+    while ((line = get_next_line(fd)) != NULL) {
+        printf("%s", line);
+        free(line);  // Don't forget to free memory if you use dynamic allocation
+    }
+    close(fd);
+    return 0;
+}
+*/
 
 char	*get_next_line(int fd)
 {
@@ -59,14 +73,14 @@ char	*get_next_line(int fd)
 
 	// static char *variable to store excess characters (after \n)
 	
-	return (str);
+	return (line);
 }
 
 // READ MALLOC FREE
 
 // REKURENCJA
 
-char	*recursive(char *line, int index, static char *excess, int fd)
+int	recursive(int index, char *excess, int fd)
 {
 	int i;
 	int j;
@@ -77,7 +91,7 @@ char	*recursive(char *line, int index, static char *excess, int fd)
 	i = 0;
 	j = 0;
 	bytes_read = read(fd, buffer, BUFFER_SIZE - 1);
-	if (read == -1)
+	if (bytes_read < 0)
 		write(1, "ERROR!\n", 7);
 	while (buffer[i] != '\0' && buffer[i] != '\n')
 		{
@@ -93,13 +107,13 @@ char	*recursive(char *line, int index, static char *excess, int fd)
 			++j;
 		}
 		excess[j] = '\0';
-		line = mallock(index);
+		line = malloc(index);
 		// line = mallock(index + 1);
 		// line[index - 1] = '\0';
 	}
 	else
 	{
-		recursive(*line, index, *excess, fd);
+		recursive(index, excess, fd);
 	}
 	while (i >= 0)
 		{
