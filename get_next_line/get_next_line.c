@@ -6,7 +6,7 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 19:52:05 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/13 20:06:20 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/21 14:50:37 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,34 +14,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
-RETURN VALUES OF "READ":
-0 EOF
--1 ERROR
-else works fine, returns the number of bytes successfully read
-
-Because you will have to read files in get_next_line(),
-add this option to your compiler call: -D BUFFER_SIZE=n
-*/
-
 #ifndef BUFFER_SIZE
 
-BUFFER_SIZE 42;
+#define BUFFER_SIZE 42
 
 #endif
-/* int	BUFFER_SIZE = 42; 
-
-int main() {
-    int fd = open("example.txt", O_RDONLY);
-    char *line;
-    while ((line = get_next_line(fd)) != NULL) {
-        printf("%s", line);
-        free(line);  // Don't forget to free memory if you use dynamic allocation
-    }
-    close(fd);
-    return 0;
-}
-*/
 
 char	*get_next_line(int fd)
 {
