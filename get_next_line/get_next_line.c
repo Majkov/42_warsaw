@@ -6,7 +6,7 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 19:52:05 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/21 14:50:37 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/22 16:21:46 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,41 +15,38 @@
 #include <stdlib.h>
 
 #ifndef BUFFER_SIZE
-
 #define BUFFER_SIZE 42
-
 #endif
 
 char	*get_next_line(int fd)
 {
 	char		*line;
-	char		buffer[BUFFER_SIZE];
+	char		*temp;
 	static char	*excess;
 	int			i;
 
 	i = 0;
 	if (fd == -1 || BUFFER_SIZE <= 1)
-		write(1, "ERROR!\n", 7);
-	// if (BUFFER_SIZE <= 1)
-	// 	write(1, "ERROR!\n", 7);
-	if (excess[0] == '\n')
 	{
-		++i;
-		while(excess[i] != '\0' && excess[i] != '\n')
-			++i;
-		if (excess[i] == '\n')
-		line = malloc(i);
-		while (i >= 0)
-		{
-			line[i] = excess[i];
-		}
-		
+		write(1, "ERROR!\n", 7);
+		return('ERROR!');
 	}
-	else
-		read(fd, buffer, BUFFER_SIZE - 1);
+	while (excess[i] != '\0' && excess != NULL)
+	{
+		if (excess[i] == '\n' || excess[i] == EOF)
+		{
+			//return line and shorten excess
+			line = malloc(i + 2);
+			temp = malloc(sizeof(excess) - i);
+			//copy or split or memcpy or ft_substr
+		}
+		//keep reading
+	}
+	if (line[0] != '\0' && line != NULL)
+	{
+		read(fd, i);
+	}
 
-	// static char *variable to store excess characters (after \n)
-	
 	return (line);
 }
 
