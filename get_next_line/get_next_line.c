@@ -6,7 +6,7 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 19:52:05 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/22 16:21:46 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/26 19:01:15 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ char	*get_next_line(int fd)
 	}
 	if (line[0] != '\0' && line != NULL)
 	{
-		read(fd, i);
+		line = recursive(i, *excess, fd);
 	}
 
 	return (line);
@@ -54,7 +54,7 @@ char	*get_next_line(int fd)
 
 // REKURENCJA
 
-int	recursive(int index, char *excess, int fd)
+char	*recursive(int index, char *excess, int fd)
 {
 	int i;
 	int j;
@@ -67,21 +67,22 @@ int	recursive(int index, char *excess, int fd)
 	bytes_read = read(fd, buffer, BUFFER_SIZE - 1);
 	if (bytes_read < 0)
 		write(1, "ERROR!\n", 7);
-	while (buffer[i] != '\0' && buffer[i] != '\n')
-		{
-			++i;
-			++index;
-		}
-		
-	if (buffer[i] == '\n' || bytes_read < BUFFER_SIZE - 1)
+	while (buffer[i] != '\0' && buffer[i] != '\n' && buffer[i] != EOF)
 	{
+		++i;
+		++index;
+	}
+	if (buffer[i] == '\n' || buffer[i] == EOF)
+	{
+		line = malloc(index);
+		// ecxess -> line copy
+		excess = malloc(BUFFER_SIZE - i);
 		while (buffer[i + j] != '\0')
 		{
 			excess[j] = buffer[i + j];
 			++j;
 		}
 		excess[j] = '\0';
-		line = malloc(index);
 		// line = mallock(index + 1);
 		// line[index - 1] = '\0';
 	}
@@ -90,10 +91,10 @@ int	recursive(int index, char *excess, int fd)
 		recursive(index, excess, fd);
 	}
 	while (i >= 0)
-		{
-			line[index] = buffer[i];
-			--i;
-			--index;
-		}
-	return (index);
+	{
+		line[index] = buffer[i];
+		--i;
+		--index;
+	}
+	return (line);
 }
