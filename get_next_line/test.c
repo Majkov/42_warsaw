@@ -1,39 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 19:52:05 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/28 19:03:41 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/04/01 16:54:28 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 42
 #endif
 
 char	*recursive(int index, char *excess, int fd);
-char	*get_next_line(int fd);
-
-int	main()
-{
-	int fd;
-	fd = open("test.txt", O_RDONLY);
-	printf("fd: %i\n", fd);
-	printf("gnl1", fd);
-	printf("%s",get_next_line(fd));
-	printf("gnl2", fd);
-	printf("%s",get_next_line(fd));
-	close(fd);
-	return (0);
-}
 
 char	*get_next_line(int fd)
 {
@@ -42,21 +27,15 @@ char	*get_next_line(int fd)
 	static char	*excess;
 	int			i;
 	int			j;
-	
-	printf("2\n");
-	printf("fd: %i, BUFFER_SIZE: %i\n", fd, BUFFER_SIZE);
+
 	i = 0;
 	if (fd == -1 || BUFFER_SIZE <= 1)
 	{
-		printf("2\n");
 		// write(1, "ERROR!\n", 7);
 		return (NULL);
 	}
-	printf("222\n");
-	printf("c %c, p %p\n", 'a', excess);
-	while (/*excess[i] != '\0' &&*/ excess != NULL)
+	while (excess[i] != '\0' && excess != NULL)
 	{
-		printf("3\n");
 		if (excess[i] == '\n' || excess[i] == EOF)
 		{
 			//return line and shorten excess
@@ -84,7 +63,6 @@ char	*get_next_line(int fd)
 			while (temp[j] != '\0')
 			{
 				temp[j] = excess[i];
-				++j;
 			}
 			temp[j] = '\0';
 			free(excess);
@@ -94,14 +72,11 @@ char	*get_next_line(int fd)
 		//keep reading
 		++i;
 	}
-	printf("4\n");
-	if (/*line[0] != '\0' ||*/ line != NULL)
+	if (line[0] != '\0' || line != NULL)
 	{
-		printf("5\n");
 		line = recursive(i, excess, fd);
 	}
-	
-	printf("6\n");
+
 	return (line);
 }
 
@@ -116,12 +91,10 @@ char	*recursive(int index, char *excess, int fd)
 	ssize_t bytes_read;
 	char buffer[BUFFER_SIZE];
 	char	*line;
-	
-	printf("7\n");
+
 	i = 0;
 	j = 0;
 	bytes_read = read(fd, buffer, BUFFER_SIZE - 1);
-	printf("bytes %i\n", bytes_read);
 	if (bytes_read < 0)
 	{
 		write(1, "ERROR!\n", 7);
@@ -129,33 +102,23 @@ char	*recursive(int index, char *excess, int fd)
 	}
 	while (buffer[i] != '\0' && buffer[i] != '\n' && buffer[i] != EOF)
 	{
-		printf("8.1\n");
-		printf("i %i\n", buffer[i]);
-		printf("c %c\n", buffer[i]);
 		++i;
 		++index;
 	}
-	printf("i %i\n", buffer[i]);
-	if (buffer[i] == '\n' || bytes_read == 0)
+	if (buffer[i] == '\n' || buffer[i] == EOF)
 	{
-		printf("8.2\n");
 		line = malloc(index + 2);
 		if (line == NULL)
 		{
 			free(line);
 			return (NULL);
 		}
-		printf("9\n");
 		// ecxess -> line copy
-		if (excess != NULL)
+		while (excess[j] != '\0')
 		{
-			while (excess[j] != '\0')
-			{
-				line[j] = excess[j];
-				++j;
-			}
+			line[j] = excess[j];
+			++j;
 		}
-		printf("10\n");
 		free(excess);
 		excess = malloc(BUFFER_SIZE - i);
 		if (excess == NULL)
@@ -163,15 +126,12 @@ char	*recursive(int index, char *excess, int fd)
 			free(excess);
 			return (NULL);
 		}
-		printf("11\n");
 		j = 0;
 		while (buffer[i + j + 1] != '\0')
 		{
 			excess[j] = buffer[i + j + 1];
 			++j;
 		}
-		printf("12\n");
-		printf("12\n");
 		excess[j] = '\0';
 		j = 0;
 		// line = mallock(index + 1);
@@ -180,7 +140,7 @@ char	*recursive(int index, char *excess, int fd)
 	else
 	{
 		--i;
-		// line = recursive(index, excess, fd);
+		recursive(index, excess, fd);
 	}
 	while (i >= 0)
 	{
@@ -188,6 +148,6 @@ char	*recursive(int index, char *excess, int fd)
 		--i;
 		--index;
 	}
-	printf("13\n");
 	return (line);
 }
+
