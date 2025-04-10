@@ -6,10 +6,13 @@
 /*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 14:23:27 by mmajka            #+#    #+#             */
-/*   Updated: 2025/03/22 16:21:48 by mmajka           ###   ########.fr       */
+/*   Updated: 2025/03/28 18:40:15 by mmajka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {

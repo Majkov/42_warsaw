@@ -1,196 +1,207 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mmajka <mmajka@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 19:52:05 by mmajka            #+#    #+#             */
-/*   Updated: 2025/04/01 18:10:17 by mmajka           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 42
+#define BUFFER_SIZE 1
 #endif
 
-char	*recursive(int index, char *excess, int fd);
+char	*ft_strchr(const char *s, int c);
+char	*ft_strdup(const char *s);
+char	*ft_strjoin(char const *s1, char const *s2);
+
 char	*get_next_line(int fd);
 
-int	main()
-{
-	int fd;
-	fd = open("test.txt", O_RDONLY);
-	printf("fd: %i\n", fd);
-	printf("gnl1\n");
-	printf("%s",get_next_line(fd));
-	printf("gnl2\n");
-	printf("%s",get_next_line(fd));
-	close(fd);
-	return (0);
-}
+// https://stackoverflow.com/questions/68144753/using-read-for-reading-a-file-in-c
+
+// int	main()
+// {
+// 	int fd;
+// 	fd = open("test.txt", O_RDONLY);
+// 	// printf("fd: %i\n", fd);
+// 	// printf("11111111111111111111\n");
+// 	printf("gnl1: %s\n",get_next_line(fd));
+// 	// printf("22222222222222222222\n");
+// 	printf("gnl2: %s\n",get_next_line(fd));
+// 	close(fd);
+// 	return (0);
+// }
 
 char	*get_next_line(int fd)
 {
-	char		*line;
-	char		*temp;
-	static char	excess[BUFFER_SIZE];
-	int			i;
-	int			j;
-	
-	printf("2\n");
-	printf("fd: %i, BUFFER_SIZE: %i\n", fd, BUFFER_SIZE);
-	i = 0;
-	if (fd == -1 || BUFFER_SIZE <= 1)
+	// int         i;
+    char        *ptr;
+    char        *line;
+	char        buffer[BUFFER_SIZE + 1];
+	ssize_t     bytes_read;
+	static char *excess;
+    
+	// int i;
+	// int j;
+	// char	*line;
+	// char		*temp;
+	// int			j;
+
+    if (fd == -1 || BUFFER_SIZE < 1)
 	{
-		printf("2\n");
+		// // printf("2\n");
 		// write(1, "ERROR!\n", 7);
 		return (NULL);
 	}
-	printf("222\n");
-	printf("c %c, p %p\n", 'a', excess);
-	while (/*excess[i] != '\0' &&*/ excess != NULL)
-	{
-		printf("3\n");
-		if (excess[i] == '\n' /*|| excess[i] == EOF*/)
-		{
-			//return line and shorten excess
-			line = malloc(i + 2);
-			if (line == NULL)
-			{
-				free(line);
-				return (NULL);
-			}
-			temp = malloc(sizeof(excess) - i - 1);
-			if (temp == NULL)
-			{
-				free(temp);
-				return (NULL);
-			}
-			//copy or split or memcpy or ft_substr
-			while (j <= i)
-			{
-				line[j] = excess[j];
-				++j;
-			}
-			line[j] = '\0';
-			j = 0;
-			++i;
-			while (temp[j] != '\0')
-			{
-				temp[j] = excess[i];
-				++j;
-			}
-			temp[j] = '\0';
-			// free(excess);
-			// excess = temp;
-			return (line);
-		}
-		//keep reading
-		++i;
-	}
-	printf("4\n");
-	if (/*line[0] != '\0' ||*/ line != NULL)
-	{
-		printf("5\n");
-		line = recursive(i, excess, fd);
-	}
-	
-	printf("6\n");
-	return (line);
+    line = "";
+    // printf("excess: %p\n", excess);
+    // printf("excess: %s\n", excess);
+    if (excess != NULL)
+    {
+		line = ft_strdup(excess);
+        ptr = ft_strchr(line, '\n');
+        if (ptr != NULL)
+        {
+			
+            excess = ft_strdup(ptr + 1);
+            // printf("excess: %s\n", excess);
+            // printf("buffer: %s\n", buffer);
+            *(ptr + 1) = '\0';
+            // printf("line: %s\n", line);
+            // printf("buffer: %s\n", buffer);
+            line = ft_strdup(line);
+            // printf("line: %s\n", line);
+            return (line);
+        }
+        else
+        {
+            // printf("line: %s\n", line);
+            // printf("buffer: %s\n", excess);
+            line = ft_strdup(line);
+            // printf("line: %s\n", line);
+        }
+    }
+    bytes_read = read(fd, buffer, BUFFER_SIZE);
+    buffer[bytes_read] = '\0';
+    // printf("excess: %s\n", excess);
+    // printf("buffer: %s\n", buffer);
+    while (bytes_read != 0)
+    {
+        // printf("Buffer: %s\n", buffer);
+        // printf("excess: %s\n", excess);
+        // printf("ptr: %p\n", ptr);
+        if (bytes_read == -1)
+            return (NULL);
+        ptr = ft_strchr(buffer, '\n');
+        // printf("ptr: %p\n", ptr);
+        // printf("line: %p\n", line);
+        // printf("line: %s\n", line);
+        if (ptr != NULL)
+        {
+            excess = ft_strdup(ptr + 1);
+            // printf("1excess: %s\n", excess);
+            // printf("2buffer: %s\n", buffer);
+            *(ptr + 1) = '\0';
+            // printf("line: %s\n", line);
+            // printf("buffer: %s\n", buffer);
+            line = ft_strjoin(line, buffer);
+            // printf("line: %s\n", line);
+            return (line);
+        }
+        else
+        {
+            // printf("line: %s\n", line);
+            // printf("buffer: %s\n", buffer);
+            line = ft_strjoin(line, buffer);
+            // printf("line: %s\n", line);
+        }
+        bytes_read = read(fd, buffer, BUFFER_SIZE);
+        buffer[bytes_read] = '\0';
+    }
+    return (line);
 }
 
-// READ MALLOC FREE
+//##########
 
-// REKURENCJA
-
-char	*recursive(int index, char *excess, int fd)
+char	*ft_strchr(const char *s, int c)
 {
-	int i;
-	int j;
-	ssize_t bytes_read;
-	char buffer[BUFFER_SIZE];
-	char	*line;
-	
-	printf("7\n");
-	i = 0;
-	j = 0;
-	bytes_read = read(fd, buffer, BUFFER_SIZE - 1);
-	printf("bytes %li\n", bytes_read);
-	if (bytes_read < 0)
+	while (*s != '\0')
 	{
-		write(1, "ERROR!\n", 7);
+		if (*s == c % 256)
+		{
+			return ((char *)s);
+		}
+		++s;
+	}
+	if (*s == c % 256)
+		return ((char *)s);
+	else
+		return (0);
+}
+
+char	*ft_strdup(const char *s)
+{
+	size_t	len;
+	char	*ptr;
+
+	len = 0;
+	while (s[len] != '\0')
+		len++;
+	ptr = malloc(len + 1);
+	if (ptr == NULL)
+	{
+		// free(ptr);
+		// free((char *)s);
 		return (NULL);
 	}
-	while (buffer[i] != '\0' && buffer[i] != '\n' && buffer[i] != EOF)
+	len = 0;
+	while (s[len] != '\0')
 	{
-		printf("8.1\n");
-		printf("i %i\n", buffer[i]);
-		printf("c %c\n", buffer[i]);
-		++i;
-		++index;
+		ptr[len] = s[len];
+		++len;
 	}
-	printf("i %i\n", buffer[i]);
-	if (buffer[i] == '\n' || bytes_read == 0)
+	ptr[len] = s[len];
+	// free((char *)s);
+	return (ptr);
+}
+
+static void	len(char const *s, size_t *len);
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	char	*ptr;
+	size_t	len1;
+	size_t	len2;
+
+	len(s1, &len1);
+	len(s2, &len2);
+	ptr = malloc(len1 + len2 + 1);
+	if (ptr == NULL)
 	{
-		printf("8.2\n");
-		line = malloc(index + 2);
-		if (line == NULL)
-		{
-			free(line);
-			return (NULL);
-		}
-		printf("9\n");
-		// ecxess -> line copy
-		if (excess != NULL)
-		{
-			while (excess[j] != '\0')
-			{
-				line[j] = excess[j];
-				++j;
-			}
-		}
-		printf("10\n");
-		free(excess);
-		excess = malloc(bytes_read - i);
-		if (excess == NULL)
-		{
-			free(excess);
-			return (NULL);
-		}
-		printf("11\n");
-		j = 0;
-		while (buffer[i + j + 1] != '\0')
-		{
-			printf("%c\n", buffer[i + j + 1]);
-			excess[j] = buffer[i + j + 1];
-			++j;
-		}
-		printf("12\n");
-		printf("12\n");
-		printf("%s\n", excess);
-		// excess = excess;
-		// excess[j] = '\0';
-		j = 0;
-		// line = mallock(index + 1);
-		line[index + 1] = '\0';
+		// free((char *)s1);
+		// free((char *)s2);
+		// free(ptr);
+		return (NULL);
 	}
-	else
+	len2 = 0;
+	while (s1[len2] != '\0')
 	{
-		--i;
-		// line = recursive(index, excess, fd);
+		ptr[len2] = s1[len2];
+        // printf("c: %c\n", ptr[len2]);
+		++len2;
 	}
-	while (i >= 0)
+	while (s2[len2 - len1] != '\0')
 	{
-		line[index] = buffer[i];
-		--i;
-		--index;
+        ptr[len2] = s2[len2 - len1];
+        // printf("c: %c\n", ptr[len2]);
+		++len2;
 	}
-	printf("13\n");
-	return (line);
+	ptr[len2] = '\0';
+    // printf("s: %s\n", ptr);
+	// free((char *)s1);
+	// free((char *)s2);
+	return (ptr);
+}
+
+static void	len(char const *s, size_t *len)
+{
+	*len = 0;
+	while (s[*len] != '\0')
+		++*len;
 }
