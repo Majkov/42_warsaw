@@ -39,7 +39,7 @@ char	*get_next_line(int fd)
 {
 	char		*line;
 	char		*temp;
-	static char	*excess;
+	static char	excess[BUFFER_SIZE];
 	int			i;
 	int			j;
 	
@@ -87,8 +87,8 @@ char	*get_next_line(int fd)
 				++j;
 			}
 			temp[j] = '\0';
-			free(excess);
-			excess = temp;
+			// free(excess);
+			// excess = temp;
 			return (line);
 		}
 		//keep reading
